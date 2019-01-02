@@ -81,7 +81,14 @@ def create_app(config_name):
         else:
             return make_response(jsonify({"status": 404, "error": "Resource not found."}))
 
-
+    @app.route('/api/v1/red-flags/<red_flag_id>/comment', methods=['PATCH'])
+    def update_redflag_comment(red_flag_id):
+        comment = json.loads(request.data)['comment']
+        data = database.update_comment_of_incident(red_flag_id, comment)
+        if data:
+            return make_response(jsonify({"status": 200, "data": [{"id": data[0], "message":"Updated red-flag record’s comment"}]}))
+        else:
+            return make_response(jsonify({"status": 404, "error": "Resource not found."}))
 
     from .auth import auth_blueprint
     app.register_blueprint(auth_blueprint)
