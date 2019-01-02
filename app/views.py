@@ -64,7 +64,13 @@ def create_app(config_name):
         else:
             return make_response(jsonify({"status":404, "error":"No resource added yet."}))
 
-
+    @app.route('/api/v1/red-flags/<red_flag_id>', methods=['GET'])
+    def get_a_redflag(red_flag_id):
+        data = database.get_incident_by_id(red_flag_id)
+        if data:
+            return make_response(jsonify({"status": 200, "data": [data]})), 200
+        else:
+            return make_response(jsonify({"status": 404, "error": "Resource not found."})), 404
 
 
     from .auth import auth_blueprint

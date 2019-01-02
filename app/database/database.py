@@ -61,6 +61,13 @@ class Database:
         red_flags = self.cursor.fetchall()
         return red_flags
 
+    def get_incident_by_id(self, id):
+        sql_select_incident_query = """SELECT * FROM incidents WHERE id = {0}""".format(
+            str(id))
+        self.cursor.execute(sql_select_incident_query)
+        incident = self.cursor.fetchone()
+        return incident
+
     def delete_all_tables(self):
         sql_delete_command_users_table = "TRUNCATE TABLE users RESTART IDENTITY CASCADE"
         sql_delete_command_incidents_table="TRUNCATE TABLE incidents RESTART IDENTITY CASCADE"
