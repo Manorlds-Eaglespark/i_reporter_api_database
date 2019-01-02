@@ -70,7 +70,7 @@ def create_app(config_name):
         if data:
             return make_response(jsonify({"status": 200, "data": [data]})), 200
         else:
-            return make_response(jsonify({"status": 404, "error": "Resource not found."})), 
+            return make_response(jsonify({"status": 404, "error": "Resource not found."})), 404
             
     @app.route('/api/v1/red-flags/<red_flag_id>/location', methods=['PATCH'])
     def update_redflag_location(red_flag_id):
@@ -87,6 +87,14 @@ def create_app(config_name):
         data = database.update_comment_of_incident(red_flag_id, comment)
         if data:
             return make_response(jsonify({"status": 200, "data": [{"id": data[0], "message":"Updated red-flag record’s comment"}]}))
+        else:
+            return make_response(jsonify({"status": 404, "error": "Resource not found."}))
+
+    @app.route('/api/v1/red-flags/<red_flag_id>', methods=['DELETE'])
+    def delete_redflag(red_flag_id):
+        if database.get_incident_by_id(red_flag_id):
+            database.delete_incident(red_flag_id)
+            return make_response(jsonify({"status": 200, "data": [{"id": red_flag_id, "message": "red-flag record has been deleted"}]}))
         else:
             return make_response(jsonify({"status": 404, "error": "Resource not found."}))
 

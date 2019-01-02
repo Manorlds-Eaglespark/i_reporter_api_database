@@ -62,8 +62,7 @@ class Database:
         return red_flags
 
     def get_incident_by_id(self, id):
-        sql_select_incident_query = """SELECT * FROM incidents WHERE id = {0}""".format(
-            str(id))
+        sql_select_incident_query = """SELECT * FROM incidents WHERE id = {0}""".format(id)
         self.cursor.execute(sql_select_incident_query)
         incident = self.cursor.fetchone()
         return incident
@@ -80,6 +79,15 @@ class Database:
         sql_update_incident_comment = """UPDATE incidents SET comment = %s WHERE id = %s"""
         self.cursor.execute(sql_update_incident_comment,(new_comment, incident_id))
         sql_select_incident_query = """SELECT * FROM incidents WHERE id = {0}""".format(incident_id)
+        self.cursor.execute(sql_select_incident_query)
+        incident = self.cursor.fetchone()
+        return incident
+
+    def delete_incident(self, incident_id):
+        sql_delete_incident = "DELETE FROM incidents WHERE id = {0}".format(incident_id)
+        self.cursor.execute(sql_delete_incident)
+        sql_select_incident_query = """SELECT * FROM incidents WHERE id = {0}""".format(
+            incident_id)
         self.cursor.execute(sql_select_incident_query)
         incident = self.cursor.fetchone()
         return incident
