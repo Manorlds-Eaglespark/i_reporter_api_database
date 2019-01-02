@@ -55,6 +55,12 @@ class Database:
                             incident.type, incident.location, incident.status, incident.images, incident.videos, incident.comment)
         self.cursor.execute(postgres_insert_incident_query, record_to_insert)
 
+    def get_all_red_flags(self):
+        sql_get_red_flags_query = """SELECT * FROM incidents where type='red-flag'"""
+        self.cursor.execute(sql_get_red_flags_query)
+        red_flags = self.cursor.fetchall()
+        return red_flags
+
     def delete_all_tables(self):
         sql_delete_command_users_table = "TRUNCATE TABLE users RESTART IDENTITY CASCADE"
         sql_delete_command_incidents_table="TRUNCATE TABLE incidents RESTART IDENTITY CASCADE"

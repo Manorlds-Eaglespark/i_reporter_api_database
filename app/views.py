@@ -55,7 +55,18 @@ def create_app(config_name):
         else:
             return make_response(jsonify({"status": validated_inputs[0], "error": validated_inputs[1]}))
 
-    
+
+    @app.route('/api/v1/red-flags', methods=['GET'])
+    def get_redflags():
+        data = database.get_all_red_flags()
+        if data:
+            return make_response(jsonify({"status": 200, "data": data})), 200
+        else:
+            return make_response(jsonify({"status":404, "error":"No resource added yet."}))
+
+
+
+
     from .auth import auth_blueprint
     app.register_blueprint(auth_blueprint)
     return app
