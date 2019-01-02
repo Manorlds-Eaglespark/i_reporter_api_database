@@ -29,9 +29,8 @@ class Database:
         sql_command_incidents_table = ("CREATE TABLE IF NOT EXISTS incidents"
                                    "(id SERIAL PRIMARY KEY,"
                                    "created_on TIMESTAMP NOT NULL,"
-                                   "created_by TEXT NOT NULL,"
+                                   "created_by INTEGER NOT NULL,"
                                    "type TEXT NULL,"
-                                   "email TEXT NOT NULL,"
                                    "location TEXT NOT NULL,"
                                    "status TEXT NOT NULL,"
                                    "images TEXT NOT NULL,"
@@ -40,6 +39,21 @@ class Database:
         self.cursor.execute(sql_command_users_table)
         self.cursor.execute(sql_command_incidents_table)
         self.cursor.connection.commit()
+
+    def get_like_this_in_database(self, comment, created_by):
+        postgresql_select_incidents_query = """SELECT * FROM incidents where comment = %s and created_by = %s"""
+        self.cursor.execute(
+            postgresql_select_incidents_query, (comment, created_by))
+        incident = self.cursor.fetchone()
+        return incident
+
+    def save_incident(self, incident):
+        postgres_insert_incident_query = ("INSERT INTO incidents ("
+                                        "created_on, created_by, type, location, status,"
+                                        "images, videos, comment) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)")
+        record_to_insert = (incident.created_on, incident.created_by,
+                            incident.type, incident.location, incident.status, incident.images, incident.videos, incident.comment)
+        self.cursor.execute(postgres_insert_incident_query, record_to_insert)
 
     def delete_all_tables(self):
         sql_delete_command_users_table = "TRUNCATE TABLE users RESTART IDENTITY CASCADE"
