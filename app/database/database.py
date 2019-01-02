@@ -68,6 +68,15 @@ class Database:
         incident = self.cursor.fetchone()
         return incident
 
+    def update_location_of_incident(self, incident_id, new_location):
+        sql_update_incident_location = """UPDATE incidents SET location = %s WHERE id = %s"""
+        self.cursor.execute(sql_update_incident_location,(new_location, incident_id))
+        sql_select_incident_query = """SELECT * FROM incidents WHERE id = {0}""".format(incident_id)
+        self.cursor.execute(sql_select_incident_query)
+        incident = self.cursor.fetchone()
+        return incident
+
+
     def delete_all_tables(self):
         sql_delete_command_users_table = "TRUNCATE TABLE users RESTART IDENTITY CASCADE"
         sql_delete_command_incidents_table="TRUNCATE TABLE incidents RESTART IDENTITY CASCADE"

@@ -70,7 +70,17 @@ def create_app(config_name):
         if data:
             return make_response(jsonify({"status": 200, "data": [data]})), 200
         else:
-            return make_response(jsonify({"status": 404, "error": "Resource not found."})), 404
+            return make_response(jsonify({"status": 404, "error": "Resource not found."})), 
+            
+    @app.route('/api/v1/red-flags/<red_flag_id>/location', methods=['PATCH'])
+    def update_redflag_location(red_flag_id):
+        location = json.loads(request.data)['location']
+        data = database.update_location_of_incident(red_flag_id, location)
+        if data:
+            return make_response(jsonify({"status": 200, "data": [{"id":data[0], "message":"Updated red-flag record’s location"}]}))
+        else:
+            return make_response(jsonify({"status": 404, "error": "Resource not found."}))
+
 
 
     from .auth import auth_blueprint
