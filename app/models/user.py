@@ -26,7 +26,8 @@ class User:
     def password_is_valid(self, password):
         return Bcrypt().check_password_hash(self.password, password)
 
-    def generate_token(self, user_id, isadmin):
+    @staticmethod
+    def generate_token(user_id, isadmin):
         try:
             """ set up a payload with an expiration time"""
             payload = {

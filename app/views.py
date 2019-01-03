@@ -46,9 +46,8 @@ def create_app(config_name):
 
             if not duplicate_exists:      
                 red_flag = Incident(input_list)
-                database.save_incident(red_flag)
-                return make_response(jsonify({"status": 201, "data": [{"id": database.get_like_this_in_database(
-                    comment, created_by)[0], "message": "Created red-flag record"}]})), 201
+                id = database.save_incident(red_flag)
+                return make_response(jsonify({"status": 201, "data": [{"id": id, "message": "Created red-flag record"}]})), 201
             else:
                 return make_response(jsonify({ "error": "This record was saved already.", "status": 400})), 400
                 
@@ -75,18 +74,20 @@ def create_app(config_name):
     @app.route('/api/v1/red-flags/<red_flag_id>/location', methods=['PATCH'])
     def update_redflag_location(red_flag_id):
         location = json.loads(request.data)['location']
-        data = database.update_location_of_incident(red_flag_id, location)
+        data = database.get_incident_by_id(red_flag_id)
         if data:
-            return make_response(jsonify({"status": 200, "data": [{"id":data[0], "message":"Updated red-flag record’s location"}]}))
+            database.update_location_of_incident(red_flag_id, location)
+            return make_response(jsonify({"status": 200, "data": [{"id":data_id, "message":"Updated red-flag record’s location"}]}))
         else:
             return make_response(jsonify({"status": 404, "error": "Resource not found."}))
 
     @app.route('/api/v1/red-flags/<red_flag_id>/comment', methods=['PATCH'])
     def update_redflag_comment(red_flag_id):
         comment = json.loads(request.data)['comment']
-        data = database.update_comment_of_incident(red_flag_id, comment)
+        data = database.get_incident_by_id(red_flag_id)
         if data:
-            return make_response(jsonify({"status": 200, "data": [{"id": data[0], "message":"Updated red-flag record’s comment"}]}))
+            database.update_comment_of_incident(red_flag_id, comment)
+            return make_response(jsonify({"status": 200, "data": [{"id": id, "message":"Updated red-flag record’s comment"}]}))
         else:
             return make_response(jsonify({"status": 404, "error": "Resource not found."}))
 

@@ -40,6 +40,22 @@ class Database:
         self.cursor.execute(sql_command_incidents_table)
         self.cursor.connection.commit()
 
+
+    def get_registered_user(self, email):
+        sql_select_user_query = """SELECT * FROM users WHERE email = '{0}'""".format(email)
+        self.cursor.execute(sql_select_user_query)
+        user = self.cursor.fetchone()
+        return user
+
+    def save_user(self, user):
+        postgres_insert_user_query = ("INSERT INTO users ("
+                                        "firstname, lastname, othernames, email, password, phonenumber,"
+                                        "username, registered, isadmin) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)")
+        record_to_insert = (user.firstname, user.lastname, user.othernames, user.email, user.password, user.phonenumber, user.username, user.registered, user.isadmin)
+        self.cursor.execute(postgres_insert_user_query, record_to_insert)
+        saved_user = self.get_registered_user(user.email)
+        return saved_user[0]   #return user id.
+
     def get_like_this_in_database(self, comment, created_by):
         postgresql_select_incidents_query = """SELECT * FROM incidents where comment = %s and created_by = %s"""
         self.cursor.execute(
@@ -54,6 +70,8 @@ class Database:
         record_to_insert = (incident.created_on, incident.created_by,
                             incident.type, incident.location, incident.status, incident.images, incident.videos, incident.comment)
         self.cursor.execute(postgres_insert_incident_query, record_to_insert)
+        saved_incident = self.get_like_this_in_database(incident.comment, incident.created_by)
+        return saved_incident[0]    #return only id from returned incident tuple
 
     def get_all_red_flags(self):
         sql_get_red_flags_query = """SELECT * FROM incidents where type='red-flag'"""
@@ -70,27 +88,14 @@ class Database:
     def update_location_of_incident(self, incident_id, new_location):
         sql_update_incident_location = """UPDATE incidents SET location = %s WHERE id = %s"""
         self.cursor.execute(sql_update_incident_location,(new_location, incident_id))
-        sql_select_incident_query = """SELECT * FROM incidents WHERE id = {0}""".format(incident_id)
-        self.cursor.execute(sql_select_incident_query)
-        incident = self.cursor.fetchone()
-        return incident
-
+        
     def update_comment_of_incident(self, incident_id, new_comment):
         sql_update_incident_comment = """UPDATE incidents SET comment = %s WHERE id = %s"""
         self.cursor.execute(sql_update_incident_comment,(new_comment, incident_id))
-        sql_select_incident_query = """SELECT * FROM incidents WHERE id = {0}""".format(incident_id)
-        self.cursor.execute(sql_select_incident_query)
-        incident = self.cursor.fetchone()
-        return incident
 
     def delete_incident(self, incident_id):
         sql_delete_incident = "DELETE FROM incidents WHERE id = {0}".format(incident_id)
         self.cursor.execute(sql_delete_incident)
-        sql_select_incident_query = """SELECT * FROM incidents WHERE id = {0}""".format(
-            incident_id)
-        self.cursor.execute(sql_select_incident_query)
-        incident = self.cursor.fetchone()
-        return incident
 
     def delete_all_tables(self):
         sql_delete_command_users_table = "TRUNCATE TABLE users RESTART IDENTITY CASCADE"
